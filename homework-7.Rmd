@@ -1,0 +1,45 @@
+---
+title: "SDS 192: Homework # 7"
+author: Natalia Iannucci
+output: 
+  html_document:
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+``` 
+
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(RMySQL)
+db <- dbConnect(MySQL(), 
+                host = "scidb.smith.edu", 
+                user = "mth292", 
+                password = "RememberPi", 
+                dbname = "yelp")
+knitr::opts_chunk$set(connection = db, max.print = 20)
+```
+
+```{sql, connection=db}
+SELECT businesses.name, COUNT(DISTINCT reviews.user_id ) AS num_reviews, COUNT(DISTINCT reviews.user_id) AS num_reviewers_in_reviewer_table, COUNT(DISTINCT users.user_id) AS num_reviewers_in_users_table, AVG(reviews.stars) AS mean_number_of_stars
+FROM businesses 
+LEFT JOIN reviews
+	ON reviews.business_id = businesses.id
+LEFT JOIN users
+	ON reviews.user_id = users.user_id
+WHERE businesses.name LIKE '%taco%'
+GROUP BY businesses.id
+HAVING num_reviews >= 25
+ORDER BY mean_number_of_stars DESC
+LIMIT 0, 20;
+```
+
+
+
+

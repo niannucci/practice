@@ -1,0 +1,27 @@
+---
+title: 'SDS 192 Homework #3'
+author: Natalia Iannucci
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, echo=FALSE}
+library(tidyverse)
+```
+
+```{r message=FALSE}
+my_starwars_tbl <- starwars %>%
+  filter(!is.na(species)) %>%  
+  mutate(bmi = (mass / (height / 100)^2 )) %>%
+  group_by(species) %>%
+  summarize(N = n(), 
+            avg_height = mean(height, na.rm = TRUE), 
+            avg_mass = mean(mass, na.rm = TRUE), 
+            avg_bmi = mean(bmi, na.rm = TRUE)) %>%
+  arrange(desc(N))
+
+my_starwars_tbl 
+```

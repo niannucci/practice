@@ -1,0 +1,44 @@
+---
+title: "SDS 192: Homework #2"
+author: Natalia Iannucci
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Problem 2
+```{r message=FALSE}
+library(tidyverse)
+a_new_hope <- starwars %>%
+  filter(mass < 1000,
+         grepl("A New Hope", films))
+```
+
+```{r message=FALSE}
+character_dimensions <- ggplot(a_new_hope, aes(x = mass, y = height, color = species))
+
+character_dimensions <- character_dimensions +
+  geom_point() +
+  ylab("Height (centimeters)") +
+  xlab("Mass (kilograms)") +
+  ggtitle("Height and Mass of Characters in a New Hope (1977)") +
+  labs(subtitle = "Separated by Species")
+
+character_dimensions
+```
+
+Problem 3
+```{r eval=FALSE}
+install.packages(ggrepel)
+```
+```{r message=FALSE}
+library(ggrepel)
+```
+
+```{r message=FALSE}
+character_dimensions + 
+  geom_label_repel(aes(label = name, color = species))
+
+```

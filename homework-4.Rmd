@@ -1,0 +1,99 @@
+---
+title: "SDS 192 HW #4"
+author: "Natalia Iannucci"
+output: 
+  html_document:
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Problem 3
+```{r message = FALSE}
+library(tidyverse)
+library(babynames) 
+library(ggthemes)
+```
+
+```{r message = FALSE, warning = FALSE}
+jessie_girls <- babynames %>%
+  filter(name == "Jessie") %>%
+  group_by(year) %>%
+  mutate(total_prop = sum(prop)) %>%
+  filter(sex == "F") %>%
+  mutate(perc_girls = (prop / total_prop) * 100)
+
+```
+
+```{r message = FALSE, warning = FALSE}
+jessie_unisex <- jessie_girls %>%
+  mutate(unisex = abs(perc_girls - 50)) %>%
+  arrange(unisex) %>%
+  head(1)
+
+```
+
+```{r message = FALSE, warning=FALSE}
+jessie_graph <- ggplot(jessie_girls, aes(x = year, y = perc_girls)) +
+  geom_line() +
+  geom_area(fill = "#F6A79A") +
+  scale_x_continuous(limits = c(1930, 2010), breaks = c(1940, 1960, 1980, 2000), labels = c("1940", "1960" = "'60", "1980" = "'80", "2000"), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(0, 100), breaks = c(0, 50, 100), labels = c("0" = "0%", "50" = "50%", "100" = "100%"), expand = c(0, 0)) +
+  theme(axis.title.x = element_blank(), axis.title.y = element_blank(), panel.background = element_rect(fill = "#88BAD3"), panel.grid = element_blank())  +
+  geom_text(x = 1950, y = 25, label = paste("Most         \n unisex year"), size = 12, fontface = "italic") +
+  theme(axis.text = element_text(size = 30, color = "black", family = "Century Gothic")) +
+  geom_point(data = jessie_unisex, aes(x = year, y = perc_girls), shape = 21, size = 10, color = "black", fill = "white") +
+  geom_segment(aes(x = 1940, y = 50.0, xend = 1946, yend = 50.0)) +
+  geom_segment(aes(x = 1940, y = 44.0, xend = 1940, yend = 50.0)) +
+  geom_text(x = 1995, y = 80, label = paste("BOYS"), size = 15, color = "white", family = "Century Gothic") +
+  geom_text(x = 1995, y = 20, label = paste("GIRLS"), size = 15, color = "white", family = "Century Gothic") +
+  theme(axis.ticks.y = element_blank(), axis.ticks.length = unit(0.4, "cm")) +
+  theme(text = element_text(family = "Century Gothic")) +
+  ggtitle("1. Jessie") +
+  theme(plot.title = element_text(face = "bold", size = 40))
+  
+jessie_graph            
+```
+
+
+
+
+Problem 4
+```{r message = FALSE, warning=FALSE}
+actual_names <- c("Jessie", "Marion", "Jackie", "Alva", "Ollie",
+                  "Jody", "Cleo", "Kerry", "Frankie", "Guadalupe", 
+                  "Carey", "Tommie", "Angel", "Hollis", "Sammie",
+                  "Jamie", "Kris", "Robbie", "Tracy", "Merrill", 
+                  "Noel", "Rene", "Johnnie", "Ariel", "Jan", 
+                  "Devon", "Cruz", "Michel", "Gale", "Robin", 
+                  "Dorian", "Casey", "Dana", "Kim", "Shannon") %>%
+  enframe(name = "actual_rank", value = "name")
+
+```
+
+```{r message = FALSE, warning = FALSE}
+unisex_point_function <- function(name_arg) {
+  babynames %>%
+    filter(name == name_arg) %>%
+    mutate(total_prop = sum(prop)) %>%
+    mutate(perc_girls = ((prop / total_prop) * 100)) %>%
+    mutate(unisex = abs(perc_girls - 50)) %>%
+    arrange(unisex) %>%
+    head(1)
+}
+
+unisex_name_points <- map(actual_names$names, unisex_point_function)
+```
+
+```{r message = FALSE, warning = FALSE}
+girl_name_function <- function(name_arg) {
+  babynames %>%
+    filter(name == name_arg) %>%
+    group_by(year) %>%
+    mutate(total_prop = sum(prop)) %>%
+    filter(sex == "F") %>%
+    mutate(perc_girls = ((prop / total_prop) * 100))
+}
+```

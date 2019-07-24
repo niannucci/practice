@@ -1,0 +1,49 @@
+---
+title: "SDS 192: HW #5"
+author: Natalia Iannucci
+output: 
+  html_document:
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Problem 2
+```{r, message = FALSE}
+library(tidyverse)
+library(tidycensus)
+library(sf)
+options(tigris_use_cache = TRUE)
+census_api_key("2c4b7b2488a6277854f4d4075fd50571f34882e9")
+
+ma_tracts <- get_acs(
+  state = "MA",
+  geography = "tract",
+  variables = c("B01003_001", "B19301_001"),
+  geometry = TRUE, 
+  keep_geo_vars = TRUE
+) %>%
+  st_transform(4326) %>%
+  mutate(var_name = ifelse(variable == "B01003_001", "population", "income"))
+```
+
+```{r, message = FALSE}
+hampshire_tracts <- ma_tracts %>%
+  filter(COUNTYFP == "015")
+```
+
+Problem 3:
+```{r, message = FALSE}
+hampshire_map <- ggplot(hampshire_tracts, aes(fill = estimate)) +
+  geom_sf() +
+  scale_fill_continuous(type = "viridis") +
+  labs(title = "Population and Median Income in Western Massachusetts Census tracts", caption = "Source: 2016 American Community Survey") +
+  facet_wrap(~var_name) 
+
+hampshire_map
+```
+
+Problem 4:
+The use of color in this map is problematic because the range of income data is different from the range of population data. The estimates for population are all on the low end of the color scale used for both graphs, thus there is very little variation in color in the population map. It is not possible to tell which tract has the largest population becuase there are several that are dark purple, but they are too similar in shade to differentiate between.
